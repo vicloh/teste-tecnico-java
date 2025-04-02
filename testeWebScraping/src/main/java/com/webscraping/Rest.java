@@ -21,9 +21,14 @@ import java.util.zip.ZipOutputStream;
 @RequestMapping("/api")
 public class Rest {
 
+    private final TesteUmService testeUm;
+    private final TesteDoisService testeDois;
+
     @Autowired
-    TesteUmService testeUm;
-    TesteDoisService testeDois;
+    public Rest(TesteUmService testeUm, TesteDoisService testeDois) {
+        this.testeUm = testeUm;
+        this.testeDois = testeDois;
+    }
 
     @GetMapping("/zip")
     public ResponseEntity<Resource> zipPdfs() {
@@ -56,7 +61,16 @@ public class Rest {
 
     @GetMapping("/tabelaCSV")
     public ResponseEntity<Resource> extractCsv() {
+
+        if (testeDois == null) {
+            System.err.println("testeDoisService não foi injetado corretamente!");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+
         try {
+
+            System.out.println("testeDois: " + testeDois); // Verifica se a injeção ocorreu
+
             String pdfPath = "Anexo_I.pdf"; // Precisa já estar baixado
             String csvPath = "Rol_Procedimentos.csv";
 
